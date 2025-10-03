@@ -10,7 +10,7 @@ It provides functions for querying device information, status, errors, power, an
 Clone and install directly from GitHub:
 
 ```bash
-pip install git+https://github.com/your-username/lambda_mini.git
+pip install git+https://github.com/Peter-Barrow/lambda-mini-laser.git
 ````
 
 ## Usage
