@@ -34,6 +34,10 @@ To launch the graphical interface:
 ```bash
 python -m lambda_mini.lambda_mini
 ```
+Alternatively it will be available on `$PATH` as
+```bash
+lambda-mini-gui
+```
 
 This will open a window where you can connect to the laser, enable/disable it, adjust power, and view device status.
 
