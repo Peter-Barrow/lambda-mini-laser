@@ -5,6 +5,25 @@ It provides functions for querying device information, status, errors, power, an
 
 ![gui](screenshot.png)
 
+## Features
+
+- Query device information (`laser_get_device_info`)
+- Monitor system status (`laser_get_status`)
+- Read temperature values (`laser_get_temperature`)
+- Retrieve error codes and descriptions (`laser_get_error`)
+- Initialize and manage a new connection (`laser_new`, `laser_init`)
+- Enable or disable the laser (`laser_enable`, `laser_disable`)
+- Inspect and control laser power:
+  - Get maximum power (`laser_get_max_power`)
+  - Read current power settings (`laser_power_info`)
+  - Set power level (`laser_set_power`)
+- Data classes for structured information:
+  - `LaserDeviceInfo`
+  - `LaserStatus`
+  - `LaserTemperature`
+  - `LaserPower`
+  - `LaserError`
+
 ## Installation
 
 Clone and install directly from GitHub:
