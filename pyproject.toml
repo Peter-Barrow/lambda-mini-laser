@@ -1,0 +1,20 @@
+[project]
+name = "lambda-mini"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { email = "peter.barrow.93@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "pyqt6>=6.9.1",
+    "pyserial>=3.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+lambda-mini-gui = "lambda_mini.lambda_mini:main"
