@@ -252,6 +252,11 @@ def laser_enable(
     laser_power = laser_power_info(serial_connection)
     laser_error = laser_get_error(serial_connection)
 
+    laser_set_power(serial_connection, power_info=laser_power, power=0.0)
+    command = "O=1\r\n".encode()
+    serial_connection.write(command)
+    sleep(1.0)
+
     return (
         laser_info,
         laser_status,
@@ -263,8 +268,9 @@ def laser_enable(
 
 def laser_disable(serial_connection: serial.Serial, power_info: LaserPower):
     laser_set_power(serial_connection, power_info=power_info, power=0.0)
-    command = "O=1\r\n".encode()
+    command = "O=0\r\n".encode()
     serial_connection.write(command)
+    sleep(1.0)
 
 
 def laser_get_power(serial_connection: serial.Serial) -> float:
