@@ -1,7 +1,7 @@
 [project]
 name = "lambda-mini"
 version = "0.1.0"
-description = "Add your description here"
+description = "Library for rgb-lasersystems lambda mini lasers"
 readme = "README.md"
 authors = [
     { email = "peter.barrow.93@gmail.com" }
