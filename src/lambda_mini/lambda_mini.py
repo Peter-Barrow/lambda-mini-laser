@@ -138,7 +138,7 @@ error_descriptions = {
     0x01: "Temperature of laser head is too high",
     0x02: "Temperature of laser head is too low",
     0x04: "Temperature sensor connection is broken",
-    0x08: "Temperaturesensor cable is shorted",
+    0x08: "Temperature sensor cable is shorted",
     0x40: "Current for laser head is too high",
     0x80: "Internal error - laser system cannot be activated",
 }
@@ -415,7 +415,11 @@ class LaserControlUI(QMainWindow):
         if self.serial_conn is None:
             port = self.port_input.text().strip()
             if not port:
-                QMessageBox.warning(self, "Error", "Please enter a serial port.")
+                QMessageBox.warning(
+                    self,
+                    "Error",
+                    "Please enter a serial port.",
+                )
                 return
 
             try:
@@ -437,7 +441,11 @@ class LaserControlUI(QMainWindow):
 
                 QMessageBox.information(self, "Success", "Connected to laser.")
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to connect: {str(e)}")
+                QMessageBox.critical(
+                    self,
+                    "Error",
+                    f"Failed to connect: {str(e)}",
+                )
         else:
             try:
                 if self.laser_enabled:
@@ -456,7 +464,11 @@ class LaserControlUI(QMainWindow):
                 self.status_label.setText("Status: Disconnected")
                 self.error_label.setText("Error: None")
                 self.temp_label.setText("Temp: -- °C")
-                QMessageBox.information(self, "Success", "Disconnected from laser.")
+                QMessageBox.information(
+                    self,
+                    "Success",
+                    "Disconnected from laser.",
+                )
             except Exception as e:
                 QMessageBox.critical(
                     self, "Error", f"Error during disconnect: {str(e)}"
@@ -480,7 +492,11 @@ class LaserControlUI(QMainWindow):
                 self.power_slider.setEnabled(True)
                 self.apply_btn.setEnabled(True)
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to enable laser: {str(e)}")
+                QMessageBox.critical(
+                    self,
+                    "Error",
+                    f"Failed to enable laser: {str(e)}",
+                )
         else:
             try:
                 laser_disable(self.serial_conn, self.power)
@@ -524,7 +540,9 @@ class LaserControlUI(QMainWindow):
             # Get error
             self.error = laser_get_error(self.serial_conn)
             if self.error:
-                self.error_label.setText(f"Error: {self.error.error_description}")
+                self.error_label.setText(
+                    f"Error: {self.error.error_description}",
+                )
                 self.error_label.setStyleSheet(
                     "color: red; font-weight: bold;",
                 )
@@ -598,9 +616,17 @@ Control Status:
                 power = self.power_from_percent(power_percentage)
                 laser_set_power(self.serial_conn, self.power, power)
                 self.power = laser_power_info(self.serial_conn)
-                QMessageBox.information(self, "Success", f"Power set to {power:.2f}")
+                QMessageBox.information(
+                    self,
+                    "Success",
+                    f"Power set to {power:.2f}",
+                )
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to set power: {str(e)}")
+                QMessageBox.critical(
+                    self,
+                    "Error",
+                    f"Failed to set power: {str(e)}",
+                )
 
     def closeEvent(self, event):
         if self.serial_conn:
