@@ -108,8 +108,6 @@ def laser_get_status(serial_connection: serial.Serial) -> LaserStatus:
     parts = response.split()
     if len(parts) >= 2:
         status_code = int(parts[1], 16)
-        # if status_code == '55.0':
-        # else:
         return LaserStatus(
             laser_on=(status_code & 0x01) != 0,
             interlock_open=(status_code & 0x04) != 0,
@@ -255,7 +253,8 @@ def laser_enable(
     laser_set_power(serial_connection, power_info=laser_power, power=0.0)
     command = "O=1\r\n".encode()
     serial_connection.write(command)
-    sleep(1.0)
+    serial_connection.timeout = timeout
+    response = serial_connection.read_all().decode().strip()
 
     return (
         laser_info,
@@ -270,7 +269,8 @@ def laser_disable(serial_connection: serial.Serial, power_info: LaserPower):
     laser_set_power(serial_connection, power_info=power_info, power=0.0)
     command = "O=0\r\n".encode()
     serial_connection.write(command)
-    sleep(1.0)
+    serial_connection.timeout = 1.0
+    response = serial_connection.read_all().decode().strip()
 
 
 def laser_get_power(serial_connection: serial.Serial) -> float:
@@ -484,8 +484,6 @@ class LaserControlUI(QMainWindow):
                     self.power,
                     self.error,
                 ) = laser_enable(self.serial_conn)
-                if self.power.max_power == 0.0:
-                    self.power = laser_power_info(self.serial_conn)
                 self.laser_enabled = True
                 self.enable_btn.setText("Disable Laser")
                 self.power = laser_power_info(self.serial_conn)
