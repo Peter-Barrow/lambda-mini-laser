@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { email = "peter.barrow.93@gmail.com" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "pyqt6>=6.9.1",
     "pyserial>=3.5",
