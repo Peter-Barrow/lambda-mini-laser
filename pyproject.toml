@@ -1,6 +1,6 @@
 [project]
 name = "lambda-mini"
-version = "0.1.0"
+version = "0.3.0"
 description = "Library for rgb-lasersystems lambda mini lasers"
 readme = "README.md"
 authors = [
@@ -10,6 +10,7 @@ requires-python = ">=3.10"
 dependencies = [
     "pyqt6>=6.9.1",
     "pyserial>=3.5",
+    "textual>=6.4.0",
 ]
 
 [build-system]

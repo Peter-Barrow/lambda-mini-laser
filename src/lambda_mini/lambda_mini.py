@@ -2,7 +2,7 @@ import sys
 import serial
 from time import sleep
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List, Tuple
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -10,11 +10,11 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QLabel,
-    QLineEdit,
     QPushButton,
     QSlider,
     QMessageBox,
     QStatusBar,
+    QComboBox,
 )
 from PyQt6.QtCore import Qt, QTimer
 
@@ -331,6 +331,39 @@ def laser_set_power(
     return power_info
 
 
+def discover() -> List[Tuple[str, str]]:
+    VID = 0x0403
+    PID = 0x6001
+    DEVICE_MANUFACTURER = "RGB Lasersystems"
+    DEVICE_PRODUCT = "Lambda Mini"
+
+    device_list: List[Tuple[str, str]] = []
+
+    from serial.tools import list_ports
+
+    ports = list_ports.comports()
+
+    for port in ports:
+        if port.pid is None or port.vid is None:
+            continue
+
+        if port.vid != VID:
+            continue
+
+        if port.pid != PID:
+            continue
+
+        if port.manufacturer != DEVICE_MANUFACTURER:
+            continue
+
+        if DEVICE_PRODUCT not in port.product:
+            continue
+
+        device_list.append((port.device, port.product))
+
+    return device_list
+
+
 class LaserControlUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -339,6 +372,7 @@ class LaserControlUI(QMainWindow):
         self.status_timer = QTimer()
         self.status_timer.timeout.connect(self.update_status_bar)
         self.init_ui()
+        self.refresh_devices()
 
     def init_ui(self):
         self.setWindowTitle("Laser Control")
@@ -350,13 +384,16 @@ class LaserControlUI(QMainWindow):
         layout.setSpacing(20)
         central_widget.setLayout(layout)
 
-        # Serial port connection
         port_layout = QHBoxLayout()
-        port_label = QLabel("Serial Port:")
-        self.port_input = QLineEdit()
-        self.port_input.setPlaceholderText("e.g., COM3 or /dev/ttyUSB0")
+        port_label = QLabel("Devices:")
         port_layout.addWidget(port_label)
-        port_layout.addWidget(self.port_input)
+        self.device_combo = QComboBox()
+        self.device_combo.setMinimumWidth(210)
+        port_layout.addWidget(self.device_combo)
+        self.refresh_btn = QPushButton("Scan")
+        port_layout.addWidget(self.refresh_btn)
+        self.refresh_btn.clicked.connect(self.refresh_devices)
+        self.refresh_btn.setToolTip("Scan for connected devices")
         layout.addLayout(port_layout)
 
         # Connect button
@@ -411,17 +448,27 @@ class LaserControlUI(QMainWindow):
         self.status_bar.addWidget(self.temp_label)
         self.status_bar.addPermanentWidget(self.info_btn)
 
+    def refresh_devices(self):
+        self.device_combo.clear()
+        device_list = discover()
+
+        if len(device_list) == 0:
+            self.device_combo.addItem("No devices found", None)
+            self.status_label.setText("No devices found")
+            self.connect_btn.setEnabled(False)
+            return
+
+        for port, description in device_list:
+            display_text = f"{port} - {description}"
+            self.device_combo.addItem(display_text, port)
+        self.status_label.setText(f"Found {len(device_list)} device(s)")
+        self.connect_btn.setEnabled(True)
+
+        # for (port, description) in device_list:
+
     def toggle_connection(self):
         if self.serial_conn is None:
-            port = self.port_input.text().strip()
-            if not port:
-                QMessageBox.warning(
-                    self,
-                    "Error",
-                    "Please enter a serial port.",
-                )
-                return
-
+            port = self.device_combo.currentData()
             try:
                 self.serial_conn = laser_new(port)
                 (
@@ -432,7 +479,6 @@ class LaserControlUI(QMainWindow):
                     self.error,
                 ) = laser_init(self.serial_conn)
                 self.connect_btn.setText("Disconnect")
-                self.port_input.setEnabled(False)
                 self.enable_btn.setEnabled(True)
                 self.info_btn.setEnabled(True)
                 self.status_timer.start(10000)  # Update status every second
@@ -455,7 +501,6 @@ class LaserControlUI(QMainWindow):
                 self.serial_conn.close()
                 self.serial_conn = None
                 self.connect_btn.setText("Connect")
-                self.port_input.setEnabled(True)
                 self.enable_btn.setEnabled(False)
                 self.enable_btn.setText("Enable Laser")
                 self.power_slider.setEnabled(False)
